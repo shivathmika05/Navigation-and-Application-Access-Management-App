@@ -4,4 +4,3 @@ class RenameUrlAndLogoInApplications < ActiveRecord::Migration[8.0]
     rename_column :applications, :logo, :app_logo
   end
 end
-

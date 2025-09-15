@@ -3,4 +3,3 @@ class DropAppModelsTable < ActiveRecord::Migration[8.0]
     drop_table :app_models
   end
 end
-

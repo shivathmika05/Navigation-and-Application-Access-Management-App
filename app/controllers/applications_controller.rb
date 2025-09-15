@@ -1,9 +1,9 @@
 class ApplicationsController < ApplicationController
-  before_action :set_application, only: [:show, :update, :destroy]
+  before_action :set_application, only: [ :show, :update, :destroy ]
 
   def index
     applications = Application.order(:id).page(params[:page]).per(params[:per_page] || 10)
-  
+
     render json: {
       applications: applications,
       meta: {
@@ -15,7 +15,7 @@ class ApplicationsController < ApplicationController
       }
     }
   end
-  
+
 
   def show
     render json: @application

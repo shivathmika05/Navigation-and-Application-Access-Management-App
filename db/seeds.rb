@@ -117,5 +117,3 @@ User.find_each do |user|
 end
 
 puts "Seed completed: #{User.count} users, #{Application.count} apps, #{Permission.count} permissions."
-
-

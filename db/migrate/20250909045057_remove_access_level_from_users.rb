@@ -3,5 +3,3 @@ class RemoveAccessLevelFromUsers < ActiveRecord::Migration[8.0]
     remove_column :users, :access_level, :integer
   end
 end
-
-

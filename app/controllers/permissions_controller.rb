@@ -1,6 +1,6 @@
 class PermissionsController < ApplicationController
-  before_action :set_permission, only: [:destroy]  
-  before_action :set_user, only: [:by_user, :update_by_user]  
+  before_action :set_permission, only: [ :destroy ]
+  before_action :set_user, only: [ :by_user, :update_by_user ]
 
   # GET /permissions
   def index
@@ -74,7 +74,7 @@ class PermissionsController < ApplicationController
     end
 
     new_level = params[:access_level].to_i
-    unless [1, 2, 3].include?(new_level)
+    unless [ 1, 2, 3 ].include?(new_level)
       return render json: { error: "Invalid access level." }, status: :unprocessable_entity
     end
 

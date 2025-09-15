@@ -8,5 +8,3 @@ class DropUsersAndApplications < ActiveRecord::Migration[8.0]
     drop_table :applications, if_exists: true, force: :cascade
   end
 end
-
-

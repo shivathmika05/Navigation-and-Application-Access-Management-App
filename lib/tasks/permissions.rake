@@ -18,10 +18,10 @@ namespace :permissions do
       Permission.create!(
         user: user,
         application: app,
-        access_level: rand(0..1),           
-        can_read: [true, false].sample,   
-        can_write: [true, false].sample,
-        can_delete: [true, false].sample
+        access_level: rand(0..1),
+        can_read: [ true, false ].sample,
+        can_write: [ true, false ].sample,
+        can_delete: [ true, false ].sample
       )
 
       puts " Assigned permissions to User##{user.id} for App##{app.id}"

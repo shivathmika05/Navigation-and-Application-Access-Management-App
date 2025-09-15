@@ -3,4 +3,3 @@ class SetDefaultAccessLevelInPermissions < ActiveRecord::Migration[5.2]
     change_column_default :permissions, :access_level, 1
   end
 end
-

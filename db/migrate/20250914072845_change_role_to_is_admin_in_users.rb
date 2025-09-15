@@ -5,4 +5,3 @@ class ChangeRoleToIsAdminInUsers < ActiveRecord::Migration[7.0]
     add_column :users, :is_admin, :boolean, default: false, null: false
   end
 end
-

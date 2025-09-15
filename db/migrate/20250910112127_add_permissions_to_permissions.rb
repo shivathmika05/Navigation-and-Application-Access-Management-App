@@ -5,4 +5,3 @@ class AddPermissionsToPermissions < ActiveRecord::Migration[8.0]
     add_column :permissions, :can_delete, :boolean, default: false, null: false
   end
 end
-
