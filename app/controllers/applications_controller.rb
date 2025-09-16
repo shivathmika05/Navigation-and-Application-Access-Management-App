@@ -16,13 +16,12 @@ class ApplicationsController < ApplicationController
     }
   end
 
-
   def show
     render json: @application
   end
 
   def create
-    app = Application.new(application_params)
+    app = Application.new(create_application_params)
     if app.save
       render json: app, status: :created
     else
@@ -31,7 +30,7 @@ class ApplicationsController < ApplicationController
   end
 
   def update
-    if @application.update(application_params)
+    if @application.update(update_application_params)
       render json: @application
     else
       render json: { errors: @application.errors.full_messages }, status: :unprocessable_entity
@@ -54,7 +53,12 @@ class ApplicationsController < ApplicationController
     render json: { error: "Application not found" }, status: :not_found
   end
 
-  def application_params
-    params.require(:application).permit(:name, :description, :url, :logo)
+
+  def create_application_params
+    params.require(:application).permit(:name, :description, :app_url, :app_logo)
+  end
+
+  def update_application_params
+    params.require(:application).permit(:name, :app_url)
   end
 end

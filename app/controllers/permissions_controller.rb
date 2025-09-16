@@ -8,13 +8,13 @@ class PermissionsController < ApplicationController
                             .order(:id)
                             .page(params[:page])
                             .per(params[:per_page] || 10)
-
+  
     render json: {
       permissions: permissions.map do |perm|
         {
           permission_id: perm.id,
-          user_id: perm.user.id,
-          application_id: perm.application.id,
+          user_name: perm.user.name,
+          application_name: perm.application.name,
           access_level: perm.access_level
         }
       end,
@@ -27,6 +27,7 @@ class PermissionsController < ApplicationController
       }
     }
   end
+  
 
   # GET /permissions/by_user/:user_id
   def by_user
@@ -44,25 +45,30 @@ class PermissionsController < ApplicationController
   end
 
   # POST /permissions
-  def create
-    existing_permission = Permission.find_by(
-      user_id: permission_params[:user_id],
-      application_id: permission_params[:application_id]
-    )
+def create
+  existing_permission = Permission.find_by(
+    user_id: params[:user_id],
+    application_id: params[:application_id]
+  )
 
-    if existing_permission
-      return render json: { error: "Permission for this user and application already exists" },
-                    status: :unprocessable_entity
-    end
-
-    permission = Permission.new(permission_params)
-
-    if permission.save
-      render json: { message: "Permission created successfully", permission: permission }, status: :created
-    else
-      render json: { errors: permission.errors.full_messages }, status: :unprocessable_entity
-    end
+  if existing_permission
+    return render json: { error: "Permission for this user and application already exists" },
+                  status: :unprocessable_entity
   end
+
+  permission = Permission.new(
+    user_id: params[:user_id],
+    application_id: params[:application_id],
+    access_level: params[:access_level]
+  )
+
+  if permission.save
+    render json: { message: "Permission created successfully", permission: permission }, status: :created
+  else
+    render json: { errors: permission.errors.full_messages }, status: :unprocessable_entity
+  end
+end
+
 
   # PUT /permissions/update_by_user/:user_id/:app_id
   def update_by_user

@@ -1,9 +1,9 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  name: MyString
-  description: MyText
+  name: Test App 1
+  app_url: https://example.com
+  app_logo: logo1.png
 
 two:
-  name: MyString
-  description: MyText
+  name: Test App 2
+  app_url: https://another.com
+  app_logo: logo2.png
