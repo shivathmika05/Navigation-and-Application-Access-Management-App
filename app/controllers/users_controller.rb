@@ -2,18 +2,8 @@ class UsersController < ApplicationController
   before_action :set_user, only: [ :show, :update, :destroy ]
 
   def index
-    users = User.order(:id).page(params[:page]).per(params[:per_page] || 10)
-
-    render json: {
-      users: users,
-      meta: {
-        current_page: users.current_page,
-        next_page: users.next_page,
-        prev_page: users.prev_page,
-        total_pages: users.total_pages,
-        total_count: users.total_count
-      }
-    }
+    @users = User.all
+    render json: @users
   end
 
   def show

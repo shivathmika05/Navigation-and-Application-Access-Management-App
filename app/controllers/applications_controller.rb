@@ -2,19 +2,13 @@ class ApplicationsController < ApplicationController
   before_action :set_application, only: [ :show, :update, :destroy ]
 
   def index
-    applications = Application.order(:id).page(params[:page]).per(params[:per_page] || 10)
-
+    applications = Application.order(:id)
+  
     render json: {
-      applications: applications,
-      meta: {
-        current_page: applications.current_page,
-        next_page: applications.next_page,
-        prev_page: applications.prev_page,
-        total_pages: applications.total_pages,
-        total_count: applications.total_count
-      }
+      applications: applications
     }
   end
+  
 
   def show
     render json: @application
@@ -59,6 +53,6 @@ class ApplicationsController < ApplicationController
   end
 
   def update_application_params
-    params.require(:application).permit(:name, :app_url)
+    params.require(:application).permit(:name, :app_url) 
   end
 end

@@ -1,33 +1,27 @@
 class PermissionsController < ApplicationController
-  before_action :set_permission, only: [ :destroy ]
-  before_action :set_user, only: [ :by_user, :update_by_user ]
+  before_action :set_permission, only: [:destroy]
+  before_action :set_user, only: [:by_user, :update_by_user]
 
   # GET /permissions
   def index
-    permissions = Permission.includes(:user, :application)
-                            .order(:id)
-                            .page(params[:page])
-                            .per(params[:per_page] || 10)
-  
-    render json: {
-      permissions: permissions.map do |perm|
-        {
-          permission_id: perm.id,
-          user_name: perm.user.name,
-          application_name: perm.application.name,
-          access_level: perm.access_level
-        }
-      end,
-      meta: {
-        current_page: permissions.current_page,
-        next_page: permissions.next_page,
-        prev_page: permissions.prev_page,
-        total_pages: permissions.total_pages,
-        total_count: permissions.total_count
+    permissions = if params[:user_id].present?
+                    Permission.includes(:user, :application)
+                              .where(user_id: params[:user_id])
+                              .order(:id)
+                  else
+                    Permission.includes(:user, :application).order(:id)
+                  end
+
+    render json: permissions.map { |perm|
+      {
+        permission_id: perm.id,
+        user_name: perm.user.name,
+        application_name: perm.application.name,
+        description: perm.application.description,
+        access_level: perm.access_level
       }
     }
   end
-  
 
   # GET /permissions/by_user/:user_id
   def by_user
@@ -45,30 +39,29 @@ class PermissionsController < ApplicationController
   end
 
   # POST /permissions
-def create
-  existing_permission = Permission.find_by(
-    user_id: params[:user_id],
-    application_id: params[:application_id]
-  )
+  def create
+    existing_permission = Permission.find_by(
+      user_id: params[:user_id],
+      application_id: params[:application_id]
+    )
 
-  if existing_permission
-    return render json: { error: "Permission for this user and application already exists" },
-                  status: :unprocessable_entity
+    if existing_permission
+      return render json: { error: "Permission for this user and application already exists" },
+                    status: :unprocessable_entity
+    end
+
+    permission = Permission.new(
+      user_id: params[:user_id],
+      application_id: params[:application_id],
+      access_level: params[:access_level]
+    )
+
+    if permission.save
+      render json: { message: "Permission created successfully", permission: permission }, status: :created
+    else
+      render json: { errors: permission.errors.full_messages }, status: :unprocessable_entity
+    end
   end
-
-  permission = Permission.new(
-    user_id: params[:user_id],
-    application_id: params[:application_id],
-    access_level: params[:access_level]
-  )
-
-  if permission.save
-    render json: { message: "Permission created successfully", permission: permission }, status: :created
-  else
-    render json: { errors: permission.errors.full_messages }, status: :unprocessable_entity
-  end
-end
-
 
   # PUT /permissions/update_by_user/:user_id/:app_id
   def update_by_user
@@ -80,7 +73,7 @@ end
     end
 
     new_level = params[:access_level].to_i
-    unless [ 1, 2, 3 ].include?(new_level)
+    unless [1, 2, 3].include?(new_level)
       return render json: { error: "Invalid access level." }, status: :unprocessable_entity
     end
 
@@ -91,12 +84,12 @@ end
     end
   end
 
-  # DELETE /permissions/:id
+  # DELETE /permissions
   def destroy
-    if @permission.destroy
+    if @permission&.destroy
       render json: { message: "Permission deleted successfully" }
     else
-      render json: { error: "Failed to delete permission" }, status: :unprocessable_entity
+      render json: { error: "Permission not found or could not be deleted" }, status: :unprocessable_entity
     end
   end
 
@@ -109,9 +102,7 @@ end
   end
 
   def set_permission
-    @permission = Permission.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    render json: { error: "Permission not found" }, status: :not_found
+    @permission = Permission.find_by(user_id: params[:user_id], application_id: params[:application_id])
   end
 
   def permission_params
