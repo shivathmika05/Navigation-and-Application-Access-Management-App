@@ -24,3 +24,7 @@ production:
 cable:
   <<: *default
   url: <%= ENV["DATABASE_URL"] %>
+
+  queue:
+  <<: *production
+  database: navigation_app_development
