@@ -2,10 +2,10 @@
   "name": "rpc-backend",
   "version": "1.0.0",
   "description": "RPC backend for Navigation & Application Access Management",
-  "main": "rpcconfig.js", 
-  "type": "module",       
+  "main": "rpcconfig.js",
+  "type": "module",
   "scripts": {
-    "start": "node rpcconfig.js",  
+    "start": "node rpcconfig.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.2",
+    "express": "^5.1.0",
     "node-fetch": "^3.3.2",
     "retoolrpc": "^0.1.7"
   }

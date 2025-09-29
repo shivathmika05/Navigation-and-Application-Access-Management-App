@@ -604,3 +604,16 @@ rpc.register({
   
 rpc.listen();
 console.log("RPC backend running...");
+
+import express from "express";
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send("RPC backend running...");
+});
+
+app.listen(PORT, () => {
+  console.log(`HTTP server running on port ${PORT}`);
+});
