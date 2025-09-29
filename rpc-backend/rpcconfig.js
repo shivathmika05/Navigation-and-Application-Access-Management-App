@@ -29,35 +29,78 @@ rpc.register({
     },
   });
   
-  rpc.register({
-    name: 'getUserByEmail',
+
+
+rpc.register({
+  name: 'getUserByEmail',
+  arguments: {
+    email: { type: "string" },
+  },
+  implementation: async ({ email }) => {
+    if (!email) throw new Error('Email is required');
+
+    const response = await fetch(
+      `${BASE_URL}/users/by_email?email=${encodeURIComponent(email)}`
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch user');
+    }
+
+    const userData = await response.json();
+
+    const permissions = {
+      can_create: userData.is_admin,
+      can_edit: userData.is_admin,
+      can_delete: userData.is_admin,
+    };
+
+    return {
+      ...userData,
+      permissions: permissions,
+    };
+  },
+});
+
+  
+rpc.register({
+    name: 'getUserByEmailWithApp',
     arguments: {
-      email: {
-        type: "string",
-      },
+      email: { type: "string", required: true },
+      appId: { type: "string", required: true },
     },
-    implementation: async ({ email }) => {
+    implementation: async ({ email, appId }) => {
       if (!email) throw new Error('Email is required');
-      const response = await fetch(`${BASE_URL}/users/by_email?email=${encodeURIComponent(email)}`);
+      if (!appId) throw new Error('appId is required');
+  
+      const response = await fetch(
+        `${BASE_URL}/users/by_email_with_app/${encodeURIComponent(email)}/${appId}`
+      );
+  
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({}));
         throw new Error(error.error || 'Failed to fetch user');
       }
+  
       const userData = await response.json();
+      const accessLevel = (userData.access_level || "").toLowerCase();
+  
       const permissions = {
-          can_create: userData.is_admin,
-          can_edit: userData.is_admin,
-          can_delete: userData.is_admin,
+        can_create: accessLevel.includes("write"),
+        can_edit: accessLevel.includes("write"),
+        can_delete: accessLevel.includes("delete"),
       };
+  
       return {
-          ...userData,
-          permissions: permissions
+        ...userData,
+        appId, // include appId in response
+        permissions,
       };
     },
   });
   
   
-
   rpc.register({
     name: "createUser",
     arguments: { name: { type: "string" }, email: { type: "string" }, is_admin: { type: "boolean" } },
@@ -419,7 +462,7 @@ rpc.register({
         body: JSON.stringify({
           user_id: args.userId,
           application_id: args.applicationId,
-          access_level: level // Send the integer value
+          access_level: level 
         })
       });
       const data = await response.json();
@@ -537,13 +580,17 @@ rpc.register({
   
   rpc.register({
     name: 'getCurrentUserPermissions',
-    arguments: { email: { type: 'string', required: true } },
-    implementation: async ({ email }) => {
+    arguments:
+    { 
+        email: { type: 'string', required: true }, 
+        application_id: { type: 'string', required: false }, 
+    },
+    implementation: async ({ email}) => {
       //  Get current user
       const userResponse = await fetch(`${BASE_URL}/users`);
       const allUsers = await userResponse.json();
       const currentUser = allUsers.find(u => u.email === email);
-      if (!currentUser) return []; // no user found
+      if (!currentUser) return []; 
   
       //  Get permissions for that user
       const permResponse = await fetch(`${BASE_URL}/permissions?user_id=${currentUser.id}`);

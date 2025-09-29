@@ -1,29 +1,45 @@
 Rails.application.routes.draw do
+  # -----------------------
   # API routes
+  # -----------------------
   namespace :api do
     namespace :v1 do
       resources :app_events, only: [:index, :show, :create, :update, :destroy]
     end
   end
 
+  # -----------------------
   # User routes
+  # -----------------------
   resources :users do
     collection do
-      get 'by_email_with_app/:email/:app_id', to: 'users#by_email_with_app'
+      # Query param version: /users/by_email_with_app?email=...&app_id=...
+      get 'by_email_with_app', to: 'users#by_email_with_app'
+    end
+
+    # Path param version: /users/by_email_with_app/:email/:app_id
+    get 'by_email_with_app/:email/:app_id', to: 'users#by_email_with_app', on: :collection, constraints: { email: /[^\/]+/ }
+
+    # Other routes
+    collection do
       get 'by_email/:email', to: 'users#by_email'
+      get 'page2', to: 'users#page2'
       put 'update/:id', to: 'users#update'
     end
   end
-  
 
+  # -----------------------
   # Application routes
+  # -----------------------
   resources :applications do
     collection do
       get 'permissions/:user_id/apps/:app_id', to: 'applications#get_app_permissions'
     end
   end
 
+  # -----------------------
   # Permission routes
+  # -----------------------
   resources :permissions, only: [:index, :show, :create, :update, :destroy] do
     collection do
       get 'by_user/:user_id', to: 'permissions#by_user'

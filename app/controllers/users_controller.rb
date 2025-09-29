@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :destroy]
+  before_action :require_admin, only: [:page2] # ✅ Protect page 2
 
   # GET /users
   def index
@@ -11,7 +12,7 @@ class UsersController < ApplicationController
   def show
     render json: @user
   end
-  
+
   # POST /users
   def create
     user = User.new(create_user_params)
@@ -28,12 +29,12 @@ class UsersController < ApplicationController
   # PUT /users/:id
   def update
     user = User.find_by(id: params[:id])
-    
+
     if user.nil?
       render json: { error: "User not found" }, status: :not_found
       return
     end
-  
+
     if user.update(user_params)
       render json: user
     else
@@ -50,13 +51,12 @@ class UsersController < ApplicationController
     end
   end
 
-  # This is the new action to get user and app permissions
   # GET /users/by_email_with_app/:email/:app_id
   def by_email_with_app
     user = User.find_by(email: params[:email])
     if user
       permission = Permission.find_by(user_id: user.id, application_id: params[:app_id])
-      
+
       if permission
         render json: user.as_json.merge(access_level: access_level_to_string(permission.access_level))
       else
@@ -67,6 +67,11 @@ class UsersController < ApplicationController
     end
   end
 
+  # ✅ NEW ACTION: Admin-only page
+  # GET /users/page2
+  def page2
+    render json: { message: "Welcome to Page 2 (Admin Only)" }
+  end
 
   private
 
@@ -79,7 +84,7 @@ class UsersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { error: "User not found" }, status: :not_found
   end
-  
+
   def create_user_params
     params.require(:user).permit(:name, :email, :is_admin)
   end
@@ -101,4 +106,11 @@ class UsersController < ApplicationController
     end
   end
 
+  # ✅ Admin check before allowing access to page 2
+  def require_admin
+    current_user = User.find_by(email: params[:email]) # You can adjust this based on your auth system
+    unless current_user&.is_admin
+      render json: { error: "Access denied: Admins only" }, status: :forbidden
+    end
+  end
 end
