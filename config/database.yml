@@ -28,3 +28,5 @@ cable:
     adapter: postgresql
     url: <%= ENV["DATABASE_URL"] %>
 
+queue:
+  url: <%= ENV['QUEUE_DATABASE_URL'] %>
