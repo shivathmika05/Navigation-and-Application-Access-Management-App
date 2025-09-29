@@ -21,10 +21,6 @@ production:
   <<: *default
   url: <%= ENV["DATABASE_URL"] %>
 
-cable:
-  <<: *default
-  url: <%= ENV["REDIS_URL"] || "redis://localhost:6379/1" %>  
 
-queue:
-  <<: *default
-  database: navigation_app_development
+
+
