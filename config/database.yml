@@ -1,37 +1,23 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  pool: 5
-  url: <%= ENV["DATABASE_URL"] %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: dpg-d3b2linfte5s739dppl0-a.oregon-postgres.render.com
+  username: navigation_app_production_user
+  password: qGfbutxk8tA2r90oJOxBNNCa2V6ghfLg
 
 development:
   <<: *default
   database: navigation_app_development
-  username: postgres
-  password: your_password_here
-  host: localhost
 
 test:
   <<: *default
   database: navigation_app_test
-  username: postgres
-  password: your_password_here
-  host: localhost
 
 production:
   <<: *default
-  url: <%= ENV["DATABASE_URL"] %>
-
-
-cable:
-  production:
-    adapter: postgresql
-    url: <%= ENV["DATABASE_URL"] %>
+  database: navigation_app_production
 
 queue:
   <<: *default
   database: navigation_app_production
-  username: navigation_app_production_user
-  password: qGfbutxk8tA2r90oJOxBNNCa2V6ghfLg
-  host: dpg-d3b2linfte5s739dppl0-a.oregon-postgres.render.com
-
