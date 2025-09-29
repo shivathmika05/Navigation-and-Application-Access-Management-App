@@ -16,6 +16,3 @@ test:
 
 production:
   <<: *default
-queue:
-  <<: *default
-  database: navigation_app_development
